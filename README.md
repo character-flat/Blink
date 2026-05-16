@@ -124,4 +124,4 @@ When it's time, a beautiful fullscreen **overlay** appears on top of whatever yo
 
 ## 📄 License
 
-MIT
+GNU General Public License v3.
