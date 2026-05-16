@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/Android-14%2B-brightgreen?logo=android&logoColor=white" />
   <img src="https://img.shields.io/badge/Kotlin-2.1-7F52FF?logo=kotlin&logoColor=white" />
   <img src="https://img.shields.io/badge/Jetpack_Compose-Material_3-4285F4?logo=jetpackcompose&logoColor=white" />
-  <img src="https://img.shields.io/github/v/release/character-flat/Blink?label=release&color=blue" />
+  <img src="https://img.shields.io/github/v/release/character-flat/Blink" />
   <img src="https://img.shields.io/badge/APK_size-1.76_MB-orange" />
 </p>
 
