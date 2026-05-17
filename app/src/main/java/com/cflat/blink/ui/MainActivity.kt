@@ -1,4 +1,4 @@
-package com.eyecare.daemon.ui
+package com.cflat.blink.ui
 
 import android.Manifest
 import android.app.AlarmManager
@@ -43,10 +43,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.eyecare.daemon.service.EyeCareService
-import com.eyecare.daemon.ui.theme.BlinkTheme
-import com.eyecare.daemon.util.PrefsManager
-import com.eyecare.daemon.util.ShizukuUtils
+import com.cflat.blink.service.EyeCareService
+import com.cflat.blink.ui.theme.BlinkTheme
+import com.cflat.blink.util.PrefsManager
+import com.cflat.blink.util.ShizukuUtils
 
 class MainActivity : ComponentActivity() {
 

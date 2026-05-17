@@ -1,4 +1,4 @@
-package com.eyecare.daemon.ui.theme
+package com.cflat.blink.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

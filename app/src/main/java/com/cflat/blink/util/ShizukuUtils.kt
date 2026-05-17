@@ -1,4 +1,4 @@
-package com.eyecare.daemon.util
+package com.cflat.blink.util
 
 import android.content.Context
 import android.content.pm.PackageManager

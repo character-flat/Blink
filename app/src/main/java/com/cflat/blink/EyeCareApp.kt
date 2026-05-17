@@ -1,4 +1,4 @@
-package com.eyecare.daemon
+package com.cflat.blink
 
 import android.app.Application
 import android.app.NotificationChannel

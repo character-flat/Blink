@@ -1,7 +1,8 @@
-package com.eyecare.daemon.ui
+package com.cflat.blink.ui
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings as AndroidSettings
 import androidx.compose.foundation.layout.*
@@ -18,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.eyecare.daemon.util.PrefsManager
+import com.cflat.blink.util.PrefsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -310,6 +311,39 @@ fun SettingsScreen(
                 )
             }
 
+            Spacer(Modifier.height(12.dp))
+
+            // ── OEM-specific guidance ────────────────────────────────
+            val oemGuide = getOemBatteryGuide()
+            if (oemGuide != null) {
+                SettingsSectionHeader("Device-Specific", Icons.Rounded.PhoneAndroid)
+                SettingsCard {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            oemGuide.title,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            oemGuide.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        oemGuide.steps.forEach { step ->
+                            Text(
+                                step,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+
             Spacer(Modifier.height(32.dp))
         }
     }
@@ -390,5 +424,111 @@ private fun SliderRow(
             steps = steps,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+// ── OEM battery guidance ──────────────────────────────────────────────────────
+
+private data class OemBatteryGuide(
+    val title: String,
+    val description: String,
+    val steps: List<String>
+)
+
+private fun getOemBatteryGuide(): OemBatteryGuide? {
+    val manufacturer = Build.MANUFACTURER.lowercase()
+    return when {
+        manufacturer.contains("xiaomi") || manufacturer.contains("redmi") || manufacturer.contains("poco") ->
+            OemBatteryGuide(
+                title = "Xiaomi/MIUI Battery Settings",
+                description = "MIUI aggressively kills background apps. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Apps > Manage Apps > Blink > Autostart > enable",
+                    "2. Settings > Apps > Manage Apps > Blink > Battery Saver > No restrictions",
+                    "3. Security app > Battery > App Battery Saver > Blink > No restrictions",
+                    "4. Lock Blink in Recents (swipe down on the app card)",
+                    "",
+                    "Note: If the system force-stops Blink, autostart on boot won't work until you open the app once."
+                )
+            )
+        manufacturer.contains("samsung") ->
+            OemBatteryGuide(
+                title = "Samsung Battery Settings",
+                description = "Samsung's battery optimization can stop background apps. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Battery > Background usage limits > Never sleeping apps > Add Blink",
+                    "2. Settings > Apps > Blink > Battery > Unrestricted",
+                    "3. Lock Blink in Recents (tap the app icon > Lock)",
+                    "",
+                    "Note: If the system force-stops Blink, autostart on boot won't work until you open the app once."
+                )
+            )
+        manufacturer.contains("huawei") || manufacturer.contains("honor") ->
+            OemBatteryGuide(
+                title = "Huawei/Honor Battery Settings",
+                description = "EMUI has aggressive power management. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Battery > App launch > Blink > Manage manually > enable all toggles",
+                    "2. Settings > Apps > Apps > Blink > Battery > enable Run in background",
+                    "3. Lock Blink in Recents (swipe down on the app card)"
+                )
+            )
+        manufacturer.contains("oppo") || manufacturer.contains("realme") || manufacturer.contains("oneplus") ->
+            OemBatteryGuide(
+                title = "OPPO/Realme/OnePlus Battery Settings",
+                description = "ColorOS aggressively manages background apps. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > App management > App list > Blink > Auto-launch > Allow",
+                    "2. Settings > Battery > More settings > Optimize battery use > Blink > Don't optimize",
+                    "3. Settings > Apps > App management > Blink > Battery usage > Allow background activity",
+                    "4. Lock Blink in Recents (tap the lock icon on the app card)",
+                    "",
+                    "Note: If the system force-stops Blink, autostart on boot won't work until you open the app once."
+                )
+            )
+        manufacturer.contains("vivo") || manufacturer.contains("iqoo") ->
+            OemBatteryGuide(
+                title = "Vivo/iQOO Battery Settings",
+                description = "Funtouch OS restricts background apps. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Apps > Autostart > enable Blink",
+                    "2. Settings > Battery > Background power consumption > Blink > Don't restrict",
+                    "3. Settings > Apps > Blink > Battery > Allow high background power consumption",
+                    "4. Lock Blink in Recents (swipe down on the app card)",
+                    "",
+                    "Note: If the system force-stops Blink, autostart on boot won't work until you open the app once."
+                )
+            )
+        manufacturer.contains("motorola") || manufacturer.contains("lenovo") ->
+            OemBatteryGuide(
+                title = "Motorola Battery Settings",
+                description = "Moto's system can still kill foreground services. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Battery > Battery optimization > All apps > Blink > Don't optimize",
+                    "2. Settings > Apps > Blink > Battery > Allow background activity",
+                    "3. Settings > Battery > Adaptive battery > turn off (optional, affects all apps)",
+                    "",
+                    "Note: If the system force-stops Blink, autostart on boot won't work until you open the app once."
+                )
+            )
+        manufacturer.contains("asus") ->
+            OemBatteryGuide(
+                title = "ASUS Battery Settings",
+                description = "ASUS power management can restrict background apps. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Battery > PowerMaster > Battery optimization > Blink > Don't optimize",
+                    "2. Settings > Battery > PowerMaster > Auto-start manager > enable Blink"
+                )
+            )
+        manufacturer.contains("nokia") ->
+            OemBatteryGuide(
+                title = "Nokia Battery Settings",
+                description = "Nokia uses DuraSpeed which limits background processes. Follow these steps:",
+                steps = listOf(
+                    "1. Settings > Battery > Background activity > enable Blink",
+                    "2. Settings > Apps > Blink > Battery > Unrestricted"
+                )
+            )
+        else -> null
     }
 }

@@ -1,4 +1,4 @@
-package com.eyecare.daemon.ui
+package com.cflat.blink.ui
 
 import android.content.Intent
 import android.os.Build
@@ -9,9 +9,9 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.eyecare.daemon.service.RestOverlayContent
-import com.eyecare.daemon.ui.theme.BlinkTheme
-import com.eyecare.daemon.util.PrefsManager
+import com.cflat.blink.service.RestOverlayContent
+import com.cflat.blink.ui.theme.BlinkTheme
+import com.cflat.blink.util.PrefsManager
 
 class RestActivity : ComponentActivity() {
 
