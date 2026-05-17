@@ -1,4 +1,4 @@
-package com.eyecare.daemon.service
+package com.cflat.blink.service
 
 import android.app.AlarmManager
 import android.app.Notification
@@ -12,11 +12,11 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.eyecare.daemon.EyeCareApp
-import com.eyecare.daemon.R
-import com.eyecare.daemon.receiver.AlarmReceiver
-import com.eyecare.daemon.ui.MainActivity
-import com.eyecare.daemon.util.PrefsManager
+import com.cflat.blink.EyeCareApp
+import com.cflat.blink.R
+import com.cflat.blink.receiver.AlarmReceiver
+import com.cflat.blink.ui.MainActivity
+import com.cflat.blink.util.PrefsManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,11 +29,14 @@ class EyeCareService : Service() {
         private const val NOTIFICATION_ID = 1001
         private const val ALERT_NOTIFICATION_ID = 1002
         private const val ALARM_REQUEST_CODE = 2001
+        private const val WATCHDOG_REQUEST_CODE = 2002
+        private const val WATCHDOG_INTERVAL_MS = 5 * 60 * 1000L // 5 minutes
 
-        const val ACTION_ALARM_FIRED = "com.eyecare.daemon.ALARM_FIRED"
-        const val ACTION_START_TIMER = "com.eyecare.daemon.START_TIMER"
-        const val ACTION_STOP_TIMER = "com.eyecare.daemon.STOP_TIMER"
-        const val ACTION_NEED_EXACT_ALARM_PERMISSION = "com.eyecare.daemon.NEED_EXACT_ALARM_PERMISSION"
+        const val ACTION_ALARM_FIRED = "com.cflat.blink.ALARM_FIRED"
+        const val ACTION_START_TIMER = "com.cflat.blink.START_TIMER"
+        const val ACTION_STOP_TIMER = "com.cflat.blink.STOP_TIMER"
+        const val ACTION_WATCHDOG = "com.cflat.blink.WATCHDOG"
+        const val ACTION_NEED_EXACT_ALARM_PERMISSION = "com.cflat.blink.NEED_EXACT_ALARM_PERMISSION"
         const val LOCK_RESET_THRESHOLD_MS = 20_000L // reset only if locked > 20s
 
         private val _remainingMs = MutableStateFlow(20 * 60 * 1000L)
@@ -94,7 +97,9 @@ class EyeCareService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        startForeground(NOTIFICATION_ID, buildServiceNotification("Starting..."))
         registerScreenReceiver()
+        scheduleWatchdog()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -106,7 +111,13 @@ class EyeCareService : Service() {
 
         when (intent?.action) {
             ACTION_ALARM_FIRED -> handleAlarmFired()
+            ACTION_WATCHDOG -> {
+                Log.d(TAG, "Watchdog fired - service is alive, rescheduling")
+                scheduleWatchdog()
+            }
             ACTION_STOP_TIMER -> {
+                timerStartElapsed = 0L
+                cancelWatchdog()
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -142,7 +153,6 @@ class EyeCareService : Service() {
         super.onDestroy()
         _isRunning.value = false
         _isResting.value = false
-        timerStartElapsed = 0L
         cancelAlarm()
         stopCountdown()
         unregisterReceiver(screenReceiver)
@@ -246,6 +256,39 @@ class EyeCareService : Service() {
         val pendingIntent = PendingIntent.getBroadcast(
             this,
             ALARM_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun scheduleWatchdog() {
+        val alarmManager = getSystemService(AlarmManager::class.java)
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            action = ACTION_WATCHDOG
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            WATCHDOG_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val triggerAt = SystemClock.elapsedRealtime() + WATCHDOG_INTERVAL_MS
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            triggerAt,
+            pendingIntent
+        )
+    }
+
+    private fun cancelWatchdog() {
+        val alarmManager = getSystemService(AlarmManager::class.java)
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            action = ACTION_WATCHDOG
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            WATCHDOG_REQUEST_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

@@ -41,9 +41,12 @@ When it's time, a beautiful fullscreen **overlay** appears on top of whatever yo
 ### Battery & Reliability
 | Feature | Description |
 |---|---|
-| **Shizuku Integration** | Auto-whitelists app from battery optimization via `cmd deviceidle whitelist` |
+| **Shizuku Integration** | Optional — auto-whitelists app from battery optimization via `cmd deviceidle whitelist` |
 | **Battery Optimization** | Built-in toggle to request unrestricted battery access |
 | **START_STICKY** | Service restarts itself if killed by the OS |
+| **Watchdog Alarm** | 5-minute exact alarm verifies service liveness, restarts if dead |
+| **Direct Boot** | Starts on `LOCKED_BOOT_COMPLETED` before device unlock |
+| **OEM Guides** | Per-manufacturer battery settings instructions (Xiaomi, Samsung, OPPO, Vivo, etc.) |
 
 ---
 
@@ -53,8 +56,10 @@ When it's time, a beautiful fullscreen **overlay** appears on top of whatever yo
 
 | Build | Size | Description |
 |---|---|---|
-| `blink-v1.0.0-release.apk` | **1.76 MB** | Signed, R8-minified release build |
-| `blink-v1.0.0-debug.apk` | 10.4 MB | Debug build with logging |
+| `blink-v1.1.0-release.apk` | ~1.8 MB | Signed, R8-minified release build |
+| `blink-v1.1.0-debug.apk` | ~10 MB | Debug build with logging |
+
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
 
 ### Requirements
 - Android 14+ (API 34)

@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.eyecare.daemon"
+    namespace = "com.cflat.blink"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.eyecare.daemon"
+        applicationId = "com.cflat.blink"
         minSdk = 34
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
     }
 
     signingConfigs {

@@ -1,4 +1,4 @@
-package com.eyecare.daemon.service
+package com.cflat.blink.service
 
 import android.app.Service
 import android.content.Context
@@ -51,8 +51,8 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import android.content.res.Configuration
-import com.eyecare.daemon.ui.theme.BlinkTheme
-import com.eyecare.daemon.util.PrefsManager
+import com.cflat.blink.ui.theme.BlinkTheme
+import com.cflat.blink.util.PrefsManager
 
 class RestOverlayService : Service(), LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
 
